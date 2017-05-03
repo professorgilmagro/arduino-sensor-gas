@@ -3,11 +3,9 @@
 #include <ESP8266mDNS.h>
 #include <string.h>
 
-/**
-   Authentication
-*/
-char ssid[] = "GMCF";
-char pass[] = "NET1920key";
+// Dados para autenticação a rede WIFI
+char ssid[] = "[REDE]";
+char pass[] = "[SENHA]";
 
 // the IP address for the shield:
 IPAddress ip(192, 168, 1, 200);
@@ -15,7 +13,7 @@ IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
 // Define o local onde o sensor está instalado
-String local = "Cozinha";
+String local = "[IDENTIFICAÇÃO DO LOCAL ONDE ESTE SENSOR ESTÁ INSTALADO]";
 
 /**
    LED RGB PINs
