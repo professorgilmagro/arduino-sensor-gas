@@ -206,6 +206,9 @@ void drawMainPage() {
 <head>\
 <title>MQ2 - Sensor de Gas<\/title>\
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
+<meta content=\"IE=edge\" http-equiv=X-UA-Compatible>\
+<meta content=\"width=device-width,initial-scale=1\" name=viewport>\
+<meta name=\"theme-color\" content=\"#24292E\" />
 <link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\" >\
 <link href=\"http://getbootstrap.com/assets/css/docs.min.css\" rel=\"stylesheet\" >\
 </head>\
@@ -237,7 +240,7 @@ void drawMainPage() {
   message += "</div></div><p>&nbsp;</p><p>&nbsp;</p></div></div>";
   message += "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js\"></script>";
   message += "<script src=\"http://getbootstrap.com/dist/js/bootstrap.min.js\"></script>";
-  message += "<script>window.jQuery||document.write('<script src=\"http://getbootstrap.com/assets/js/vendor/jquery.min.js\"><\/script>')</script>";
+  message += "<script>window.jQuery||document.write(\'<script src=\"http://getbootstrap.com/assets/js/vendor/jquery.min.js\"><\/script>\')</script>";
   message += "</body>\
 </html>";
 
