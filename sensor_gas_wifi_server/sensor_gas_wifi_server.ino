@@ -14,6 +14,9 @@ IPAddress ip(192, 168, 1, 200);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
+// Define o local onde o sensor está instalado
+String local = "Cozinha";
+
 /**
    LED RGB PINs
 */
@@ -152,22 +155,24 @@ void setColor(int redValue, int greenValue, int blueValue) {
    Method main, manager channel and values
 */
 void handleMain() {
-  String param = server.argName( 0 ) ;
-  String value = server.arg( 0 ) ;
-
   // Rota padrão, exibe a index (informações de estado do sensor)
-  if ( server.args() == 0 ) {
+  if (server.args() == 0) {
     drawMainPage();
     return;
   }
 
   // Recupera o nível de leitura do sensor externo
-  if (server.argName(1) == "sensor_level") {
-    external_level = server.arg(1);
+  if (getArgValueOf("sensor_level") != "") {
+    external_level = getArgValueOf("sensor_level");
+  }
+
+  // Recupera o local definido pelo cliente
+  if (getArgValueOf("local") != "") {
+    local = getArgValueOf("local");
   }
 
   // Rota para ativar o alarme
-  if ( param == "alarm" && value == "on" ) {
+  if (getArgValueOf("alarm") == "on" ) {
     internal_location = false;
     alarmSystemOn();
     acceptedResponse();
@@ -175,7 +180,7 @@ void handleMain() {
   }
 
   // Rota para desativar o alarme
-  if (param == "alarm" && value == "off" ) {
+  if (getArgValueOf("alarm") == "off" ) {
     internal_location = true;
     alarmSystemOff();
     acceptedResponse();
@@ -183,9 +188,20 @@ void handleMain() {
   }
 
   // Rota para parâmetros desconhecidos
-  if ( server.args() > 0 ) {
+  if (server.args() > 0 ) {
     badRequest();
   }
+}
+
+// Retorna o valor de um determinado argumento passado via parâmetro ao servidor
+String getArgValueOf(String paramName) {
+  for (uint8_t i = 0; i < server.args(); i++) {
+    if (server.argName(i) == paramName) {
+      return server.arg(i);
+    }
+  }
+
+  return "";
 }
 
 /**
@@ -199,7 +215,6 @@ void drawMainPage() {
   String stateInfo = leaking ? "Vazamento detectado" : "Normal";
   String stateIcon = leaking ? "down" : "up";
   String stateCss = leaking ? "danger" : "success";
-  String local = internal_location ? "Cozinha" : "Porão";
 
   String message = "<!DOCTYPE html>\
 <html>\
@@ -208,12 +223,12 @@ void drawMainPage() {
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
 <meta content=\"IE=edge\" http-equiv=X-UA-Compatible>\
 <meta content=\"width=device-width,initial-scale=1\" name=viewport>\
-<meta name=\"theme-color\" content=\"#24292E\" />
-<link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\" >\
+<meta name=\"theme-color\" content=\"#24292E\" />\
+ <link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\" >\
 <link href=\"http://getbootstrap.com/assets/css/docs.min.css\" rel=\"stylesheet\" >\
 </head>\
-<body>";
-  message += "<div class=\"row\">";
+<body style=\"background-color:#6E5398\">";
+  message += "<div class=\"row\" style=\"margin:0px\">";
   message += "<a href=\"#\" class=\"v4-tease\" style=\"background:#302a2a\"><img src=\"https://www.arduino.cc/en/favicon.png\"/> Arduino Project</a>";
   message += "<main class=\"bs-docs-masthead\" id=\"content\" tabindex=\"-1\">";
   message += "<div class=\"container\">";
@@ -240,9 +255,7 @@ void drawMainPage() {
   message += "</div></div><p>&nbsp;</p><p>&nbsp;</p></div></div>";
   message += "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js\"></script>";
   message += "<script src=\"http://getbootstrap.com/dist/js/bootstrap.min.js\"></script>";
-  message += "<script>window.jQuery||document.write(\'<script src=\"http://getbootstrap.com/assets/js/vendor/jquery.min.js\"><\/script>\')</script>";
-  message += "</body>\
-</html>";
+  message += "</body></html>";
 
   server.send( 200, "text/html", message );
 }
@@ -285,4 +298,3 @@ void httpSimpleResponse(int httpCode, String message) {
 
   server.send ( httpCode, "text/plain", message );
 }
-

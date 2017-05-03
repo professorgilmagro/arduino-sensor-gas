@@ -2,6 +2,9 @@
 #include <WiFiClient.h>
 #include <string>
 
+// Nome do local/ambiente onde o sensor está instalado
+const String LOCAL_NAME = "Porão";
+
 // Dados para autenticação a rede WIFI
 char ssid[] = "GMCF";
 char pass[] = "NET1920key";
@@ -154,7 +157,7 @@ void sendAlert(String action)
   char nivel[20];
   itoa(valor_analogico, nivel, 10);
   
-  client.println("GET /?alarm=" + action + "&sensor_level=" + nivel + " HTTP/1.1");
+  client.println("GET /?alarm=" + action + "&sensor_level=" + nivel + "&local=" + LOCAL_NAME + " HTTP/1.1");
   client.println("Accept: text/html, text/plain");
   client.println("Connection: close");
 
