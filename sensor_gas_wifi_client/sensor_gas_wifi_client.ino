@@ -3,11 +3,11 @@
 #include <string>
 
 // Nome do local/ambiente onde o sensor está instalado
-const String LOCAL_NAME = "Porão";
+const String LOCAL_NAME = "[IDENTIFICAÇÃO DO LOCAL ONDE O SENSOR ESTÁ INSTALADO]";
 
 // Dados para autenticação a rede WIFI
-char ssid[] = "GMCF";
-char pass[] = "NET1920key";
+char ssid[] = "[REDE]";
+char pass[] = "[SENHA]";
 
 // IP do servidor para o qual queremos estabelecer a comunicação
 IPAddress server(192, 168, 1, 200);
