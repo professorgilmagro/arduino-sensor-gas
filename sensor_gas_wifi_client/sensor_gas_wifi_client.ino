@@ -43,10 +43,10 @@ const int SENSOR_NORMAL_LEVEL = 250;
 bool gasDetected = false;
 
 // Recebe o valor analógico do sensor de gás, (Pino A0)
-int valor_analogico = 0;
+int sensor_analog_value = 0;
 
 // Recebe o valor digital do sensor de gás, (Pino D0)
-int valor_digital = 0;
+int sensor_digital_value = 0;
 
 void setup() {
   // inicializa o comunicador serial para monitoramento
@@ -96,14 +96,14 @@ void setup() {
 void loop()
 {
   // Le os dados do pino digital D0 do sensor
-  valor_digital = digitalRead(PIN_D0);
+  sensor_digital_value = digitalRead(PIN_D0);
 
   // Le os dados do pino analogico A0 do sensor
-  valor_analogico = analogRead(PIN_A0);
+  sensor_analog_value = analogRead(PIN_A0);
 
   // Verifica o nivel de gas/fumaca detectado
   bool prevRead = gasDetected;
-  gasDetected = valor_analogico > SENSOR_NORMAL_LEVEL;
+  gasDetected = sensor_analog_value > SENSOR_NORMAL_LEVEL;
 
   // verifica se houve mudança de estado
   if (prevRead != gasDetected) {
@@ -155,8 +155,8 @@ void sendAlert(String action)
   }
 
   char nivel[20];
-  itoa(valor_analogico, nivel, 10);
-  
+  itoa(sensor_analog_value, nivel, 10);
+
   client.println("GET /?alarm=" + action + "&sensor_level=" + nivel + "&local=" + LOCAL_NAME + " HTTP/1.1");
   client.println("Accept: text/html, text/plain");
   client.println("Connection: close");

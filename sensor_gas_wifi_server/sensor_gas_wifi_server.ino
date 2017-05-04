@@ -3,6 +3,9 @@
 #include <ESP8266mDNS.h>
 #include <string.h>
 
+// Nome do local/ambiente onde o sensor está instalado
+const String LOCAL_NAME = "[IDENTIFICAÇÃO DO LOCAL ONDE ESTE SENSOR ESTÁ INSTALADO]";
+
 // Dados para autenticação a rede WIFI
 char ssid[] = "[REDE]";
 char pass[] = "[SENHA]";
@@ -33,10 +36,10 @@ int SENSOR_LEVEL = 250;
 bool gasDetected = false;
 
 // Recebe o valor analógico do sensor de gás, (Pino A0)
-int valor_analogico = 0;
+int sensor_analog_value = 0;
 
 // Recebe o valor digital do sensor de gás, (Pino D0)
-int valor_digital = 0;
+int sensor_digital_value = 0;
 
 // Flag para determinar se o vazamento é local ou externo (Local = Cozinha, Externo = Porão)
 bool internal_location = true;
@@ -68,32 +71,32 @@ void setup()
   delay(10);
 
   // Connect to WiFi network
-  WiFi.begin ( ssid, pass );
-  Serial.println ( "" );
+  WiFi.begin ( ssid, pass);
+  Serial.println ( "");
 
   // Wait for connection
-  while ( WiFi.status() != WL_CONNECTED ) {
-    delay ( 500 );
-    Serial.print ( "." );
+  while ( WiFi.status() != WL_CONNECTED) {
+    delay ( 500);
+    Serial.print ( ".");
   }
 
   WiFi.config(ip, gateway, subnet);
 
-  Serial.println ( "" );
-  Serial.print ( "Conectado a " );
-  Serial.println ( ssid );
-  Serial.print ( "IP: " );
-  Serial.println ( WiFi.localIP() );
+  Serial.println ( "");
+  Serial.print ( "Conectado a ");
+  Serial.println ( ssid);
+  Serial.print ( "IP: ");
+  Serial.println ( WiFi.localIP());
 
-  if ( MDNS.begin ( "esp8266" ) ) {
-    Serial.println ( "MDNS iniciado" );
+  if ( MDNS.begin ( "esp8266")) {
+    Serial.println ( "MDNS iniciado");
   }
 
   //Controller/Dispacher
-  server.on ( "/", handleMain );
-  server.onNotFound ( notFound );
+  server.on ( "/", handleMain);
+  server.onNotFound ( notFound);
   server.begin();
-  Serial.println ( "Servidor HTTP Iniciado" );
+  Serial.println ( "Servidor HTTP Iniciado");
 
   // inicia o alarme como desligado (Luz verde, buzzer desligado)
   alarmSystemOff();
@@ -101,14 +104,14 @@ void setup()
 
 void loop() {
   // Le os dados do pino digital D0 do sensor
-  valor_digital = digitalRead(PIN_D0);
+  sensor_digital_value = digitalRead(PIN_D0);
 
   // Le os dados do pino analogico A0 do sensor
-  valor_analogico = analogRead(PIN_A0);
+  sensor_analog_value = analogRead(PIN_A0);
 
   // Verifica o nivel de gas/fumaca detectado
   bool prevRead = gasDetected;
-  gasDetected = valor_analogico > SENSOR_LEVEL;
+  gasDetected = sensor_analog_value > SENSOR_LEVEL;
 
   // verifica se houve mudança de estado
   if (prevRead != gasDetected) {
@@ -155,22 +158,25 @@ void setColor(int redValue, int greenValue, int blueValue) {
 void handleMain() {
   // Rota padrão, exibe a index (informações de estado do sensor)
   if (server.args() == 0) {
-    drawMainPage();
+    showMainPage();
     return;
   }
 
-  // Recupera o nível de leitura do sensor externo
+  // Recupera o nível de leitura do sensor externo, caso tenha sido informado
+  external_level = getArgValueOf("sensor_level");
+
   if (getArgValueOf("sensor_level") != "") {
     external_level = getArgValueOf("sensor_level");
   }
 
-  // Recupera o local definido pelo cliente
+  // Recupera o local de leitura
+  local = LOCAL_NAME;
   if (getArgValueOf("local") != "") {
     local = getArgValueOf("local");
   }
 
   // Rota para ativar o alarme
-  if (getArgValueOf("alarm") == "on" ) {
+  if (getArgValueOf("alarm") == "on") {
     internal_location = false;
     alarmSystemOn();
     acceptedResponse();
@@ -178,15 +184,21 @@ void handleMain() {
   }
 
   // Rota para desativar o alarme
-  if (getArgValueOf("alarm") == "off" ) {
+  if (getArgValueOf("alarm") == "off") {
     internal_location = true;
+    local = LOCAL_NAME;
     alarmSystemOff();
-    acceptedResponse();
+    if (getArgValueOf("showMainPage") == "yes") {
+      showMainPage();
+    } else {
+      acceptedResponse();
+    }
+
     return;
   }
 
   // Rota para parâmetros desconhecidos
-  if (server.args() > 0 ) {
+  if (server.args() > 0) {
     badRequest();
   }
 }
@@ -199,18 +211,18 @@ String getArgValueOf(String paramName) {
     }
   }
 
-  return "";
+  return null;
 }
 
 /**
-   Main Page
+   Exibe a página principal
 */
-void drawMainPage() {
+void showMainPage() {
   char nivelInfo[20];
-  itoa(valor_analogico, nivelInfo, 10);
+  itoa(sensor_analog_value, nivelInfo, 10);
 
   bool leaking = (gasDetected || internal_location == false);
-  String stateInfo = leaking ? "Vazamento detectado" : "Normal";
+  String stateInfo = leaking ? "Vazamento" : "Normal";
   String stateIcon = leaking ? "down" : "up";
   String stateCss = leaking ? "danger" : "success";
 
@@ -221,8 +233,9 @@ void drawMainPage() {
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
 <meta content=\"IE=edge\" http-equiv=X-UA-Compatible>\
 <meta content=\"width=device-width,initial-scale=1\" name=viewport>\
+<meta http-equiv=\"refresh\" content=\"5; URL=http://192.168.1.200\" >\
 <meta name=\"theme-color\" content=\"#24292E\" />\
- <link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\" >\
+<link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\" >\
 <link href=\"http://getbootstrap.com/assets/css/docs.min.css\" rel=\"stylesheet\" >\
 </head>\
 <body style=\"background-color:#6E5398\">";
@@ -246,7 +259,7 @@ void drawMainPage() {
 
   // se os sinalizadores foram disparados, exibe o botão para silenciá-lo em situação especial
   if (leaking) {
-    message += "<a style=\"margin-right:10px;margin-bottom:10px\"class=\"btn btn-warning btn-lg float-left\" href=\"http://192.168.1.200/?alarm=off\" role=\"button\"><span class=\"glyphicon glyphicon-volume-off\" aria-hidden=\"true\"></span> Silenciar sensor</a>";
+    message += "<a style=\"margin-right:10px;margin-bottom:10px\"class=\"btn btn-warning btn-lg float-left\" href=\"http://192.168.1.200/?alarm=off&showMainPage=yes\" role=\"button\"><span class=\"glyphicon glyphicon-volume-off\" aria-hidden=\"true\"></span> Silenciar sensor</a>";
   }
 
   message += "</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>";
@@ -255,7 +268,7 @@ void drawMainPage() {
   message += "<script src=\"http://getbootstrap.com/dist/js/bootstrap.min.js\"></script>";
   message += "</body></html>";
 
-  server.send( 200, "text/html", message );
+  server.send(200, "text/html", message);
 }
 
 /**
@@ -285,14 +298,14 @@ void httpSimpleResponse(int httpCode, String message) {
   message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
-  message += ( server.method() == HTTP_GET ) ? "GET" : "POST";
+  message += ( server.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
 
-  for ( uint8_t i = 0; i < server.args(); i++ ) {
-    message += " " + server.argName ( i ) + ": " + server.arg ( i ) + "\n";
+  for ( uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName ( i) + ": " + server.arg ( i) + "\n";
   }
 
-  server.send ( httpCode, "text/plain", message );
+  server.send ( httpCode, "text/plain", message);
 }
