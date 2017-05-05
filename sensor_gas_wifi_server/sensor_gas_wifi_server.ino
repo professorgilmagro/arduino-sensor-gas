@@ -211,7 +211,7 @@ String getArgValueOf(String paramName) {
     }
   }
 
-  return null;
+  return "";
 }
 
 /**
@@ -225,6 +225,7 @@ void showMainPage() {
   String stateInfo = leaking ? "Vazamento" : "Normal";
   String stateIcon = leaking ? "down" : "up";
   String stateCss = leaking ? "danger" : "success";
+  String hostAddress = "http://" + WiFi.localIP().toString();
 
   String message = "<!DOCTYPE html>\
 <html>\
@@ -233,7 +234,7 @@ void showMainPage() {
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
 <meta content=\"IE=edge\" http-equiv=X-UA-Compatible>\
 <meta content=\"width=device-width,initial-scale=1\" name=viewport>\
-<meta http-equiv=\"refresh\" content=\"5; URL=http://192.168.1.200\" >\
+<meta http-equiv=\"refresh\" content=\"5; URL=" + hostAddress + "\" >\
 <meta name=\"theme-color\" content=\"#24292E\" />\
 <link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\" >\
 <link href=\"http://getbootstrap.com/assets/css/docs.min.css\" rel=\"stylesheet\" >\
@@ -259,7 +260,7 @@ void showMainPage() {
 
   // se os sinalizadores foram disparados, exibe o botão para silenciá-lo em situação especial
   if (leaking) {
-    message += "<a style=\"margin-right:10px;margin-bottom:10px\"class=\"btn btn-warning btn-lg float-left\" href=\"http://192.168.1.200/?alarm=off&showMainPage=yes\" role=\"button\"><span class=\"glyphicon glyphicon-volume-off\" aria-hidden=\"true\"></span> Silenciar sensor</a>";
+    message += "<a style=\"margin-right:10px;margin-bottom:10px\" class=\"btn btn-warning btn-lg float-left\" href=\"" + hostAddress + "/?alarm=off&showMainPage=yes\" role=\"button\"><span class=\"glyphicon glyphicon-volume-off\" aria-hidden=\"true\"></span> Silenciar sensor</a>";
   }
 
   message += "</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>";
