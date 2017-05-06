@@ -3,20 +3,21 @@
 #include <ESP8266mDNS.h>
 #include <string.h>
 
+
 // Nome do local/ambiente onde o sensor está instalado
-const String LOCAL_NAME = "[IDENTIFICAÇÃO DO LOCAL ONDE ESTE SENSOR ESTÁ INSTALADO]";
+const String LOCAL_NAME = "Cozinha";
 
 // Dados para autenticação a rede WIFI
-char ssid[] = "[REDE]";
-char pass[] = "[SENHA]";
+char ssid[] = "";
+char pass[] = "";
 
 // the IP address for the shield:
 IPAddress ip(192, 168, 1, 200);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
-// Define o local onde o sensor está instalado
-String local = "[IDENTIFICAÇÃO DO LOCAL ONDE ESTE SENSOR ESTÁ INSTALADO]";
+// Faz o controle do local
+String local;
 
 /**
    LED RGB PINs
@@ -96,10 +97,12 @@ void setup()
   server.on ( "/", handleMain);
   server.onNotFound ( notFound);
   server.begin();
-  Serial.println ( "Servidor HTTP Iniciado");
+  Serial.println ("Servidor HTTP Iniciado");
 
   // inicia o alarme como desligado (Luz verde, buzzer desligado)
   alarmSystemOff();
+
+  local = LOCAL_NAME;
 }
 
 void loop() {
@@ -165,12 +168,7 @@ void handleMain() {
   // Recupera o nível de leitura do sensor externo, caso tenha sido informado
   external_level = getArgValueOf("sensor_level");
 
-  if (getArgValueOf("sensor_level") != "") {
-    external_level = getArgValueOf("sensor_level");
-  }
-
   // Recupera o local de leitura
-  local = LOCAL_NAME;
   if (getArgValueOf("local") != "") {
     local = getArgValueOf("local");
   }
@@ -234,7 +232,7 @@ void showMainPage() {
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\
 <meta content=\"IE=edge\" http-equiv=X-UA-Compatible>\
 <meta content=\"width=device-width,initial-scale=1\" name=viewport>\
-<meta http-equiv=\"refresh\" content=\"5; URL=" + hostAddress + "\" >\
+<meta http-equiv=\"refresh\" content=\"3; URL=" + hostAddress + "\" >\
 <meta name=\"theme-color\" content=\"#24292E\" />\
 <link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\" >\
 <link href=\"http://getbootstrap.com/assets/css/docs.min.css\" rel=\"stylesheet\" >\
