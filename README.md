@@ -23,11 +23,12 @@ Caso sejam mantidas as configurações conforme expressas no arquivo *sensor_gas
 
 ##### Visualização do painel
 
-![Desktop Normal](https://github.com/professorgilmagro/arduino-sensor-gas/blob/master/screenshots/webmonitor-normal.jpg)
+![Painel](https://github.com/professorgilmagro/arduino-sensor-gas/blob/master/screenshots/amostra-admistracao.jpg)
 
-![Desktop Vazamento](https://github.com/professorgilmagro/arduino-sensor-gas/blob/master/screenshots/webmonitor-vazamento.jpg)
 
-![Mobile](https://github.com/professorgilmagro/arduino-sensor-gas/blob/master/screenshots/webmonitor-mobile.jpg?raw=true)
+##### Amostra de uso em residência
+![Uso real](https://github.com/professorgilmagro/arduino-sensor-gas/blob/master/screenshots/exemplo-de-uso.jpg)
+
 
 #### Melhorias adicionais (futuras)
 Melhorias podem ser implementadas neste projeto, tais como alerta via SMS, email ou por meio de serviços (API) de mensageiros como WhatsApp, Telegram e outros.
